@@ -119,40 +119,22 @@ void randomize(Matrix<T>& m, T min, T max) {
       m.at(i, j) = distribution(rnd);
 }
 
+extern int thread_count;
+
 template<typename T>
-inline void multiply(const T& a, const T& b, T& c, int threads = 1) {
+void multiply(const T& a, const T& b, T& c) {
   if constexpr (std::is_arithmetic_v<T>) {
     c += a * b;
   } else {  // assume matrix type
     assert(a.size() == b.size() && b.size() == c.size());
     auto size = a.size();
-
-    //#pragma omp parallel for collapse(3) num_threads(threads)
+    constexpr bool d = std::is_same_v<T, MatrixBlock<int>>;
+    #pragma omp parallel for if (d) num_threads(thread_count)
     for (int i = 0; i < size; ++i)
       for (int j = 0; j < size; ++j)
         for (int k = 0; k < size; ++k)
           multiply(a.at(i, k), b.at(k, j), c.at(i, j));
   }
 }
-
-//template<typename M>
-//struct Operations {
-//  static void multiply(const M& a, const M& b, M& c) {
-//    assert(a.size == b.size && b.size == c.size);
-//
-//    for (int i = 0; i < a.size; ++i)
-//      for (int j = 0; j < a.size; ++j)
-//        for (int k = 0; k < a.size; ++k)
-//          Operations<decltype(a.at(0, 0))>::multiply(
-//              a.at(i, k), b.at(k, j), c.at(i, j));
-//  }
-//};
-//
-//template<>
-//struct Operations<int> {
-//  static void multiply(const int& a, const int& b, int& c) {
-//    c += a * b;
-//  }
-//};
 
 #endif //PIRV1_MATRIX_HPP
