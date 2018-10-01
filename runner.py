@@ -21,14 +21,8 @@ def run_binary(n: int, r: int, t: int):
 
 
 Ts = [1, 2, 4]
-Rs = [2, 5, 10, 20, 25, 30, 40, 50, 100, 200, 300, 400, 500, 600, 700, 800,
-      900, 1000, 1200, 1600, 1800, 2000, 3000]
-Ns = [
-    100, 200, 300, 400, 500,
-    600, 700, 800, 900, 1000,
-    1200, 1600, 1800, 2000,
-    3000
-]
+Rs = [1, 2, 3, 5, 10, 20, 25, 30, 40, 50]
+Ns = [200, 250, 300, 350, 400, 450, 500]
 
 
 def skip_func(n: int, r: int):
@@ -57,17 +51,20 @@ def additional_measure_count(time):
 
 
 def plot(results):
-    for n in Ns:
-        plt.plot(results[n].keys(), results[n].values())
-    plt.legend(["N = {}".format(x) for x in Ns])
+    for n in results.keys():
+        line, = plt.plot(results[n].keys(), results[n].values())
+        line.set_label('N = {}'.format(n))
+    # plt.legend(["N = {}".format(x) for x in results.keys()])
+    plt.legend()
     plt.ylabel('computation time, ms')
     plt.xlabel('block size (R)')
     plt.show()
 
 
 if __name__ == '__main__':
-    if os.path.exists('results.npy'):
-        res = np.load('results.npy').item()
+    name = 'results.npy'
+    if os.path.exists(name):
+        res = np.load(name).item()
         plot(res)
         exit()
     T = 4 # hard-coded for now
